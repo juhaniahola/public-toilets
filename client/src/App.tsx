@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { Map, TileLayer, Marker, Popup } from 'react-leaflet';
 
 import logo from './logo.png';
 
 import './App.css';
+import LeafletMap from './LeafletMap';
 
 const App = () => {
   const [results, setResults] = useState<any>([]);
@@ -59,6 +61,10 @@ const App = () => {
             </div>
           )
         })}
+
+        <LeafletMap />
+
+        {isLoading && <div className="App-loader">Ladataan...</div>}
         
         {!canUseGeoLocation && <p>Sijaintiominaisuuksien pitää olla päällä käyttääksesi palvelua.</p>}
         {canUseGeoLocation && (
