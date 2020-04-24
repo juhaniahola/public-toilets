@@ -9,12 +9,6 @@
   min-height: 100vh;
 }
 
-@media only screen and (max-width: 768px) {
-  .App {
-    width: 95vw;
-  }
-}
-
 .App-logo {
   height: 30vmin;
   pointer-events: none;
@@ -44,14 +38,6 @@
   border-radius: 30px;
   cursor: pointer;
 }
-
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-loader {
-    animation: spin 2s infinite;
-  }
-}
-
 .App-header {
   display: flex;
   flex-direction: column;
@@ -65,23 +51,72 @@
 .App-main {
   min-height: 60vh;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   font-size: calc(10px + 1vmin);
+}
 
+.App-pro-tip {
+  min-height: 10vh;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.App-pro-tip h3 {
+  font-family: 'Pacifico', monospace;
+  color: rosybrown;
+  margin: 0;
+}
+
+.App-pro-tip p {
+  margin: 0;
 }
 
 .App-footer {
-  min-height: 10vh;
+  font-size: 14px;
+  display: none;
+  min-height: 5vh;
 }
 
 .App-link {
   color: #61dafb;
 }
 
+.App-loader-wrapper {
+  max-width: 20vw;
+  height: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.App-loader {
+  width: 100%;
+  height: 100%;
+}
+
 .leaflet-container {
-  width: '100%';
+  width: 65vw;
   height: 30vh;
   margin-top: 20px;
   margin-bottom: 20px;
+}
+
+@media only screen and (max-width: 768px) {
+  .App {
+    width: 95vw;
+  }
+
+  .leaflet-container {
+    width: 95vw;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-loader {
+    animation: spin 2s infinite;
+    margin: 10vh;
+  }
 }
 
 @keyframes spin {
@@ -92,3 +127,4 @@
     transform: rotate(360deg);
   }
 }
+
