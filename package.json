@@ -1,0 +1,24 @@
+{
+  "name": "public-toilets",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aholajuhani/public-toilets.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aholajuhani/public-toilets/issues"
+  },
+  "homepage": "https://github.com/aholajuhani/public-toilets#readme",
+  "devDependencies": {
+    "concurrently": "^5.1.0"
+  }
+}
