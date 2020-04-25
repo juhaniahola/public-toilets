@@ -5,4 +5,5 @@ export interface IToilet {
     type: string;
     coordinates: number[];
   };
+  distance: number;
 }

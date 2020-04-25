@@ -1,6 +1,7 @@
 const express = require('express');
 
 const Toilet = require('./models/toilet');
+const haversine = require('./haversine');
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ router.get('/', (_req, res, _next) => {
 
 router.get('/toilets', async (req, res, _next) => {
   const kilometerInMeters = 1000;
-  const kilometers = 2;
+  const kilometers = 3;
   const maxDistance = kilometerInMeters * kilometers;
 
   const lat = req.query.lat;
@@ -56,12 +57,33 @@ router.get('/toilets', async (req, res, _next) => {
             .status(404);
         }
 
-        return res
-          .json({
-            message: `Results within ${kilometers} kilometers`,
-            response: results,
-          })
-          .status(200);
+        if (results && results.length) {
+          const resultsWithDistance = results.map((elem) => {
+            const locationLong = elem.location.coordinates[0];
+            const locationLat = elem.location.coordinates[1];
+
+            const distance = haversine({
+              lat1: lat,
+              lon1: long,
+              lat2: locationLat,
+              lon2: locationLong,
+            });
+
+            return {
+              _id: elem._id,
+              name: elem.name,
+              location: elem.location,
+              distance,
+            };
+          });
+
+          return res
+            .json({
+              message: `Results within ${kilometers} kilometers`,
+              response: resultsWithDistance,
+            })
+            .status(200);
+        }
       },
     );
   }

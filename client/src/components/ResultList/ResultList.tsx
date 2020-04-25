@@ -11,7 +11,9 @@ const ResultList = ({ results }: IProps) => {
     <div className="result-list">
       {results.map((result) => (
         <div className="result-list__item" key={result._id}>
-          <p className="result-list__item-text">{result.name}</p>
+          <p className="result-list__item-text">
+            {result.name}, {result.distance.toFixed(0)}m
+          </p>
         </div>
       ))}
     </div>
