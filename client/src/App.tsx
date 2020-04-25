@@ -2,9 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Map, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Icon } from 'leaflet';
 
-import Loader from './Loader';
+import Loader from './components/Loader';
 
 import logo from './logo.png';
+
+import WarningText from './components/WarningText';
+import NoResults from './components/NoResults';
+import ProTip from './components/ProTip';
 
 import './App.css';
 
@@ -12,29 +16,33 @@ const App = () => {
   const [results, setResults] = useState<any>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLocating, setIsLocating] = useState<boolean>(false);
-  const [userLocation, setUserLocation] = useState<any>({ lat: null, long: null })
-  const [canUseGeoLocation, setCanUseGeoLocate] = useState<boolean>(true);
+  const [userLocation, setUserLocation] = useState<any>({
+    lat: null,
+    long: null,
+  });
+  const [canUseGeoLocation, setCanUseGeoLocate] = useState<boolean>(false);
+  const [initialFetchDone, setInitialFetchDone] = useState(false);
 
   const fetchData = async (lat: number, long: number) => {
-    const response = await fetch(`/api/toilets?lat=${lat}&long=${long}`)
+    const response = await fetch(`/api/toilets?lat=${lat}&long=${long}`);
     const json = await response.json();
     setResults(json.response);
-  }
+  };
 
   useEffect(() => {
-    if ("geolocation" in navigator) {
-      setCanUseGeoLocate(true)
+    if ('geolocation' in navigator) {
+      setCanUseGeoLocate(true);
     } else {
-      setCanUseGeoLocate(false)
+      setCanUseGeoLocate(false);
     }
   }, []);
 
   const findTheNearestToilet = async () => {
-    if(canUseGeoLocation) {
+    if (canUseGeoLocation) {
       setIsLocating(true);
       navigator.geolocation.getCurrentPosition(async (position) => {
         setIsLocating(false);
-        setIsLoading(true)
+        setIsLoading(true);
         const lat = position.coords.latitude;
         const long = position.coords.longitude;
 
@@ -42,22 +50,23 @@ const App = () => {
 
         try {
           setIsLocating(false);
-          await fetchData(lat, long)
+          await fetchData(lat, long);
         } catch (error) {
-          console.error(error)
+          console.error(error);
         } finally {
-          setIsLoading(false)
+          setIsLoading(false);
+          setInitialFetchDone(true);
         }
-      })
+      });
     }
-  }
+  };
 
   const toiletIcon = new Icon({
     iconUrl: require('./toilet.svg'),
-    iconSize: [25, 40]
-  })
+    iconSize: [25, 40],
+  });
 
-  const date = new Date()
+  const date = new Date();
   const year = date.getFullYear();
 
   return (
@@ -73,75 +82,93 @@ const App = () => {
           <h3>{results.length > 1 ? 'Lähimmät vessat:' : 'Lähin vessa:'}</h3>
         )}
 
-        {results && results.length > 0 && results.map((result: any) => {
-          return (
-            <div key={result._id}>
-              <p>{result.name}</p>
-            </div>
-          )
-        })}
-
-      {!isLocating && !isLoading && userLocation.lat && userLocation.long && (
-        <Map center={[userLocation.lat, userLocation.long]} zoom={12}>
-          <Marker position={[userLocation.lat, userLocation.long]}>
-            <TileLayer
-              attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <Popup>
-              Sijaintisi
-            </Popup>
-          </Marker>
-
-          {!isLoading && results && results.length > 0 && results.map((result:any) => {
-            const long = result.location.coordinates[0]
-            const lat = result.location.coordinates[1]
-            
+        {results &&
+          results.length > 0 &&
+          results.map((result: any) => {
             return (
-              <Marker position={[lat, long]} key={result._id} icon={toiletIcon}>
+              <div key={result._id}>
+                <p>{result.name}</p>
+              </div>
+            );
+          })}
+
+        {!isLocating &&
+          !isLoading &&
+          userLocation.lat &&
+          userLocation.long &&
+          results &&
+          results.length > 0 && (
+            <Map center={[userLocation.lat, userLocation.long]} zoom={12}>
+              <Marker position={[userLocation.lat, userLocation.long]}>
                 <TileLayer
                   attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                <Popup>
-                  {result.name}
-                </Popup>
+                <Popup>Sijaintisi</Popup>
               </Marker>
-            )
-          })}
-        </Map>
-      )}
+
+              {!isLoading &&
+                results &&
+                results.length > 0 &&
+                results.map((result: any) => {
+                  const long = result.location.coordinates[0];
+                  const lat = result.location.coordinates[1];
+
+                  return (
+                    <Marker
+                      position={[lat, long]}
+                      key={result._id}
+                      icon={toiletIcon}
+                    >
+                      <TileLayer
+                        attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      />
+                      <Popup>{result.name}</Popup>
+                    </Marker>
+                  );
+                })}
+            </Map>
+          )}
+
+        {initialFetchDone && (!results || results.length <= 0) && <NoResults />}
 
         {(isLocating || isLoading) && (
           <>
             <Loader />
-            <p>{isLocating ? 'Paikannetaan sijaintiasi...' : isLoading ? 'Etsitään lähintä vessaa...' : null}</p>
+            <p>
+              {isLocating
+                ? 'Paikannetaan sijaintiasi...'
+                : isLoading
+                ? 'Etsitään lähintä vessaa...'
+                : null}
+            </p>
           </>
         )}
-        
-        {!canUseGeoLocation && <p>Sijaintiominaisuuksien pitää olla päällä käyttääksesi palvelua.</p>}
-        
-        {canUseGeoLocation && !isLocating && !isLoading && (
-          <button type="button" className="primary-button" onClick={() => findTheNearestToilet()}>
-            Paikanna lähin käymäläni
+
+        {!canUseGeoLocation && (
+          <WarningText
+            text={
+              'Selaimen sijaintiominaisuuksien tulee olla päällä käyttääksesi palvelua.'
+            }
+          />
+        )}
+
+        {canUseGeoLocation && !isLocating && !isLoading && (
+          <button
+            type="button"
+            className="primary-button"
+            onClick={() => findTheNearestToilet()}
+          >
+            {initialFetchDone ? 'Etsi uudestaan' : 'Paikanna lähin käymäläni'}
           </button>
         )}
 
-        {/* {userLocation && userLocation.lat && userLocation.long && (
-          <p>Sijaintisi: {userLocation.lat}, {userLocation.long}</p>
-        )} */}
-
-        <div className="App-pro-tip">
-          <h3>Pro tip</h3>
-          <p>Tukemalla paikallista ravintolayrittäjää edes oluen tai kahvikupin verran, saat todennäköisesti käyttää myös ravintolan vessaa.</p>
-        </div>
-
+        <ProTip />
       </main>
-      <footer className="App-footer">
-        Copyright Juhani Ahola - {year}
-      </footer>
+      <footer className="App-footer">Copyright Juhani Ahola - {year}</footer>
     </div>
   );
-}
+};
 
 export default App;
