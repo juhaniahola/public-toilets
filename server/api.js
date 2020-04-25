@@ -13,7 +13,7 @@ router.get('/', (_req, res, _next) => {
 
 router.get('/toilets', async (req, res, _next) => {
   const kilometerInMeters = 1000;
-  const kilometers = 3;
+  const kilometers = 1.5;
   const maxDistance = kilometerInMeters * kilometers;
 
   const lat = req.query.lat;
