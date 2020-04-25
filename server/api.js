@@ -51,12 +51,6 @@ router.get('/toilets', async (req, res, _next) => {
             .status(500);
         }
 
-        if (!results.length) {
-          return res
-            .json({ message: 'No results', response: null })
-            .status(404);
-        }
-
         if (results && results.length) {
           const resultsWithDistance = results.map((elem) => {
             const locationLong = elem.location.coordinates[0];
@@ -84,6 +78,8 @@ router.get('/toilets', async (req, res, _next) => {
             })
             .status(200);
         }
+
+        return res.json({ message: 'No results', response: null }).status(404);
       },
     );
   }
