@@ -15,6 +15,7 @@ const App = () => {
   const [results, setResults] = useState<any>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLocating, setIsLocating] = useState<boolean>(false);
+  const [errorLocating, setErrorLocating] = useState<boolean>(false);
   const [userLocation, setUserLocation] = useState<any>({
     lat: null,
     long: null,
@@ -39,24 +40,35 @@ const App = () => {
   const findTheNearestToilet = async () => {
     if (canUseGeoLocation) {
       setIsLocating(true);
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        setIsLocating(false);
-        setIsLoading(true);
-        const lat = position.coords.latitude;
-        const long = position.coords.longitude;
-
-        setUserLocation({ lat, long });
-
-        try {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
           setIsLocating(false);
-          await fetchData(lat, long);
-        } catch (error) {
+          setIsLoading(true);
+          const lat = position.coords.latitude;
+          const long = position.coords.longitude;
+
+          setUserLocation({ lat, long });
+
+          try {
+            setIsLocating(false);
+            await fetchData(lat, long);
+          } catch (error) {
+            console.error(error);
+          } finally {
+            setIsLoading(false);
+            setInitialFetchDone(true);
+          }
+        },
+        (error) => {
+          setIsLocating(false);
+          setErrorLocating(true);
           console.error(error);
-        } finally {
-          setIsLoading(false);
-          setInitialFetchDone(true);
-        }
-      });
+        },
+        {
+          timeout: 10000,
+          enableHighAccuracy: true,
+        },
+      );
     }
   };
 
@@ -103,6 +115,14 @@ const App = () => {
                 : null}
             </p>
           </>
+        )}
+
+        {errorLocating && (
+          <WarningText
+            text={
+              'Paikantaminen epäonnistui... Kokeile toisella selaimella ja/tai tarkista laitteesi paikannusasetukset'
+            }
+          />
         )}
 
         {!canUseGeoLocation && (
