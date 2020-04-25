@@ -68,35 +68,8 @@
   color: #61dafb;
 }
 
-.leaflet-container {
-  width: 65vw;
-  height: 30vh;
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
-
 @media only screen and (max-width: 768px) {
   .App {
     width: 95vw;
-  }
-
-  .leaflet-container {
-    width: 95vw;
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-loader {
-    animation: spin 2s infinite;
-    margin: 10vh;
-  }
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
   }
 }

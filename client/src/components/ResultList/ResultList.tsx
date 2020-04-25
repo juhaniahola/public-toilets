@@ -10,7 +10,9 @@ const ResultList = ({ results }: IProps) => {
   return (
     <div className="result-list">
       {results.map((result) => (
-        <div>JOU</div>
+        <div className="result-list__item" key={result._id}>
+          <p className="result-list__item-text">{result.name}</p>
+        </div>
       ))}
     </div>
   );

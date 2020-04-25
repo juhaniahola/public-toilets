@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Map, TileLayer, Marker, Popup } from 'react-leaflet';
-import { Icon } from 'leaflet';
-
-import Loader from './components/Loader';
 
 import logo from './logo.png';
 
 import WarningText from './components/WarningText';
 import NoResults from './components/NoResults';
 import ProTip from './components/ProTip';
+import Loader from './components/Loader';
+import ResultList from './components/ResultList';
+import LeafletMap from './components/LeafletMap';
 
 import './App.css';
 
@@ -61,11 +60,6 @@ const App = () => {
     }
   };
 
-  const toiletIcon = new Icon({
-    iconUrl: require('./toilet.svg'),
-    iconSize: [25, 40],
-  });
-
   const date = new Date();
   const year = date.getFullYear();
 
@@ -81,16 +75,7 @@ const App = () => {
         {results && results.length > 0 && (
           <h3>{results.length > 1 ? 'Lähimmät vessat:' : 'Lähin vessa:'}</h3>
         )}
-
-        {results &&
-          results.length > 0 &&
-          results.map((result: any) => {
-            return (
-              <div key={result._id}>
-                <p>{result.name}</p>
-              </div>
-            );
-          })}
+        {results && results.length > 0 && <ResultList results={results} />}
 
         {!isLocating &&
           !isLoading &&
@@ -98,37 +83,11 @@ const App = () => {
           userLocation.long &&
           results &&
           results.length > 0 && (
-            <Map center={[userLocation.lat, userLocation.long]} zoom={12}>
-              <Marker position={[userLocation.lat, userLocation.long]}>
-                <TileLayer
-                  attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <Popup>Sijaintisi</Popup>
-              </Marker>
-
-              {!isLoading &&
-                results &&
-                results.length > 0 &&
-                results.map((result: any) => {
-                  const long = result.location.coordinates[0];
-                  const lat = result.location.coordinates[1];
-
-                  return (
-                    <Marker
-                      position={[lat, long]}
-                      key={result._id}
-                      icon={toiletIcon}
-                    >
-                      <TileLayer
-                        attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      />
-                      <Popup>{result.name}</Popup>
-                    </Marker>
-                  );
-                })}
-            </Map>
+            <LeafletMap
+              userLatitude={userLocation.lat}
+              userLongitude={userLocation.long}
+              results={results}
+            />
           )}
 
         {initialFetchDone && (!results || results.length <= 0) && <NoResults />}
